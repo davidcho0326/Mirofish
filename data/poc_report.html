@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLB Campaign Pre-Test Report</title>
+<style>
+:root {
+  --bg: #0f0f1a;
+  --card: rgba(255,255,255,0.05);
+  --card-border: rgba(255,255,255,0.1);
+  --text: #e2e8f0;
+  --text-dim: #94a3b8;
+  --accent: #3b82f6;
+  --accent2: #8b5cf6;
+  --green: #22c55e;
+  --red: #ef4444;
+  --orange: #f59e0b;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Pretendard', -apple-system, system-ui, sans-serif;
+  line-height: 1.7;
+  padding: 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+h2 {
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--card-border);
+}
+h3 { font-size: 1.1rem; color: var(--accent2); margin: 1.5rem 0 0.5rem; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  backdrop-filter: blur(10px);
+}
+.card-accent {
+  border-left: 3px solid var(--accent);
+}
+.card-green { border-left: 3px solid var(--green); }
+.card-orange { border-left: 3px solid var(--orange); }
+.card-red { border-left: 3px solid var(--red); }
+.tag {
+  display: inline-block;
+  background: rgba(59,130,246,0.2);
+  color: var(--accent);
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  margin: 2px;
+}
+.tag-green { background: rgba(34,197,94,0.2); color: var(--green); }
+.tag-orange { background: rgba(245,158,11,0.2); color: var(--orange); }
+.tag-red { background: rgba(239,68,68,0.2); color: var(--red); }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.kpi-box {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+}
+.kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.kpi-label { font-size: 0.85rem; color: var(--text-dim); margin-top: 4px; }
+pre {
+  background: rgba(0,0,0,0.4);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #a5f3fc;
+  margin: 0.8rem 0;
+}
+.formula {
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0.8rem 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+.formula .result { color: var(--green); font-weight: bold; }
+details {
+  margin: 0.5rem 0;
+}
+details > summary {
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-weight: 600;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+details > summary::before { content: "\25B6"; font-size: 0.7rem; transition: transform 0.2s; }
+details[open] > summary::before { transform: rotate(90deg); }
+details > .detail-content {
+  padding: 1rem;
+  border: 1px solid var(--card-border);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  background: rgba(0,0,0,0.2);
+}
+.persona-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  padding: 1.2rem;
+  margin: 0.8rem 0;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+}
+.persona-avatar {
+  width: 50px; height: 50px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+}
+.bar {
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  margin: 4px 0;
+}
+.bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #fff;
+  transition: width 0.6s ease;
+}
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+.pipe-step {
+  flex-shrink: 0;
+  text-align: center;
+  padding: 0.8rem 1.2rem;
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  min-width: 120px;
+  font-size: 0.82rem;
+}
+.pipe-step .step-num {
+  font-size: 0.7rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+.pipe-step .step-label { font-weight: 600; margin-top: 2px; }
+.pipe-step .step-type {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+.pipe-arrow {
+  flex-shrink: 0;
+  color: var(--accent);
+  font-size: 1.2rem;
+  padding: 0 0.3rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8rem 0;
+  font-size: 0.88rem;
+}
+th, td {
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--card-border);
+  text-align: left;
+}
+th {
+  background: rgba(59,130,246,0.1);
+  font-weight: 600;
+  color: var(--accent);
+}
+.check { color: var(--green); }
+.cross { color: var(--red); }
+.warn { color: var(--orange); }
+.reaction-text {
+  background: rgba(0,0,0,0.3);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  margin: 0.5rem 0;
+  font-style: italic;
+  border-left: 3px solid var(--accent2);
+  font-size: 0.9rem;
+}
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.risk-high { background: rgba(239,68,68,0.2); color: var(--red); }
+.risk-medium { background: rgba(245,158,11,0.2); color: var(--orange); }
+.risk-low { background: rgba(34,197,94,0.2); color: var(--green); }
+</style>
+</head>
+<body>
+
+<h1>MLB Campaign Pre-Test Analysis</h1>
+<p style="color:var(--text-dim); margin-bottom: 1.5rem;">
+  2026 SS NYC Monogram Mini Backpack &middot; "Your City, Your Style" &middot; SS &middot;
+  <span class="tag">QUICK MODE</span>
+  <span class="tag">ID: 9c322bac</span>
+  <span style="font-size:0.8rem; margin-left:8px;">2026-03-25T15:27:27</span>
+</p>
+
+<div class="kpi-grid">
+  <div class="kpi-box">
+    <div class="kpi-value">83%</div>
+    <div class="kpi-label">예측 참여율</div>
+  </div>
+  <div class="kpi-box">
+    <div class="kpi-value">+0.63</div>
+    <div class="kpi-label">감성 점수</div>
+  </div>
+  <div class="kpi-box">
+    <div class="kpi-value">60%</div>
+    <div class="kpi-label">바이럴 확률</div>
+  </div>
+  <div class="kpi-box">
+    <div class="kpi-value">57%</div>
+    <div class="kpi-label">구매 의향</div>
+  </div>
+</div>
+
+<h2>MiroFish 기술 활용 맵</h2>
+<p style="color:var(--text-dim);">
+  <a href="https://github.com/666ghj/MiroFish" target="_blank" style="color:var(--accent);">MiroFish</a>는
+  GitHub 41K+ 스타의 오픈소스 멀티 에이전트 AI 예측 엔진입니다.<br>
+  본 프로젝트는 MiroFish 코어를 포크하여 F&amp;F 패션 마케팅에 특화시킨 것입니다.
+</p>
+
+<div class="card card-accent">
+  <h3>MiroFish 핵심 기능 11개 &rarr; 현재 활용 현황</h3>
+  <table style="font-size:0.85rem;">
+    <tr><th>MiroFish 코어 모듈</th><th>원래 용도</th><th>F&amp;F 적용</th><th>상태</th><th>사용 위치</th></tr>
+    <tr>
+      <td><strong>LLMClient</strong><br><code>core/utils/llm_client.py</code></td>
+      <td>OpenAI 호환 LLM 래퍼</td>
+      <td>Claude Opus 4.6 API 호출<br>(페르소나 생성, 반응 시뮬, 추천)</td>
+      <td><span class="tag tag-green">활성</span></td>
+      <td>consumer_profiles.py<br>campaign_scorer.py</td>
+    </tr>
+    <tr>
+      <td><strong>OntologyGenerator</strong><br><code>core/ontology_generator.py</code></td>
+      <td>텍스트에서 엔티티/관계 타입 추출</td>
+      <td>패션 도메인 온톨로지 생성<br>(Template 모드 활성, LLM 모드 준비)</td>
+      <td><span class="tag tag-green">활성</span></td>
+      <td>fashion_ontology.py</td>
+    </tr>
+    <tr>
+      <td><strong>TextProcessor</strong><br><code>core/text_processor.py</code></td>
+      <td>문서 텍스트 추출/청킹</td>
+      <td>캠페인 seed 텍스트 처리</td>
+      <td><span class="tag" style="background:rgba(59,130,246,0.15);">대기</span></td>
+      <td>Full Mode에서 활용 예정</td>
+    </tr>
+    <tr>
+      <td><strong>GraphBuilderService</strong><br><code>core/graph_builder.py</code></td>
+      <td>Zep Cloud 지식그래프 구축</td>
+      <td>브랜드/경쟁사/트렌드 그래프 구축</td>
+      <td><span class="tag tag-orange">M2 계획</span></td>
+      <td>trend_predict 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>ZepEntityReader</strong><br><code>core/zep_entity_reader.py</code></td>
+      <td>그래프에서 엔티티 추출/필터</td>
+      <td>패션 소비자/인플루언서 엔티티 추출</td>
+      <td><span class="tag tag-orange">M2 계획</span></td>
+      <td>trend_predict 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>OasisProfileGenerator</strong><br><code>core/oasis_profile_generator.py</code></td>
+      <td>그래프 엔티티 &rarr; OASIS 에이전트 프로필</td>
+      <td>인플루언서/팔로워 에이전트 생성</td>
+      <td><span class="tag tag-orange">M3 계획</span></td>
+      <td>influencer_sim 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>SimulationConfigGenerator</strong><br><code>core/simulation_config_generator.py</code></td>
+      <td>LLM 기반 시뮬레이션 파라미터 자동 생성</td>
+      <td>캠페인 시뮬레이션 설정 (타임존, 활동 패턴)</td>
+      <td><span class="tag tag-orange">M3 계획</span></td>
+      <td>influencer_sim 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>SimulationRunner</strong><br><code>core/simulation_runner.py</code></td>
+      <td>OASIS 멀티 에이전트 시뮬레이션 실행</td>
+      <td>가상 SNS에서 수백 에이전트 인터랙션</td>
+      <td><span class="tag tag-orange">M3 계획</span></td>
+      <td>influencer_sim 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>SimulationManager</strong><br><code>core/simulation_manager.py</code></td>
+      <td>Twitter+Reddit 듀얼 플랫폼 오케스트레이션</td>
+      <td>Instagram/TikTok 시뮬레이션 관리</td>
+      <td><span class="tag tag-orange">M3 계획</span></td>
+      <td>influencer_sim 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>ReportAgent</strong><br><code>core/report_agent.py</code></td>
+      <td>ReACT 패턴 분석 리포트 자동 생성</td>
+      <td>경쟁사 워게이밍 심층 분석</td>
+      <td><span class="tag tag-orange">M5 계획</span></td>
+      <td>competitive_war 모듈</td>
+    </tr>
+    <tr>
+      <td><strong>ZepGraphMemoryUpdater</strong><br><code>core/zep_graph_memory_updater.py</code></td>
+      <td>시뮬레이션 후 에이전트 기억 업데이트</td>
+      <td>캠페인 반복 시뮬 시 학습 효과</td>
+      <td><span class="tag tag-orange">M5 계획</span></td>
+      <td>competitive_war 모듈</td>
+    </tr>
+  </table>
+</div>
+
+<div class="card" style="padding:2rem; overflow-x:auto;">
+  <h3 style="margin-bottom:1.5rem;">Module 1 데이터 플로우 — 코어 엔진 연결도</h3>
+  <svg viewBox="0 0 900 520" width="100%" style="display:block; font-family:'Pretendard Variable',-apple-system,sans-serif; max-width:900px; margin:0 auto;">
+    <defs>
+      <linearGradient id="grad-core" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(59,130,246,0.12)"/>
+        <stop offset="100%" stop-color="rgba(59,130,246,0.03)"/>
+      </linearGradient>
+      <linearGradient id="grad-active" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgba(34,197,94,0.15)"/>
+        <stop offset="100%" stop-color="rgba(34,197,94,0.05)"/>
+      </linearGradient>
+      <linearGradient id="grad-planned" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="rgba(245,158,11,0.1)"/>
+        <stop offset="100%" stop-color="rgba(245,158,11,0.03)"/>
+      </linearGradient>
+      <linearGradient id="grad-m1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(139,92,246,0.15)"/>
+        <stop offset="100%" stop-color="rgba(139,92,246,0.05)"/>
+      </linearGradient>
+      <linearGradient id="grad-output" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(34,197,94,0.12)"/>
+        <stop offset="100%" stop-color="rgba(34,197,94,0.04)"/>
+      </linearGradient>
+      <filter id="glow-green"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#22c55e" flood-opacity="0.4"/></filter>
+      <filter id="glow-blue"><feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="#3b82f6" flood-opacity="0.3"/></filter>
+      <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 3.5 L 0 7 z" fill="rgba(255,255,255,0.35)"/>
+      </marker>
+      <marker id="arrow-green" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="8" markerHeight="6" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 3.5 L 0 7 z" fill="#22c55e"/>
+      </marker>
+    </defs>
+
+    <!-- ===== LAYER 1: MiroFish Core Engine Box ===== -->
+    <rect x="30" y="15" width="840" height="170" rx="16" fill="url(#grad-core)" stroke="rgba(59,130,246,0.25)" stroke-width="1"/>
+    <text x="50" y="42" fill="rgba(59,130,246,0.7)" font-size="11" font-weight="700" letter-spacing="0.1em">MIROFISH CORE ENGINE</text>
+    <text x="730" y="42" fill="rgba(255,255,255,0.2)" font-size="10">github.com/666ghj/MiroFish</text>
+
+    <!-- Active modules (green) -->
+    <rect x="50" y="58" width="175" height="48" rx="10" fill="url(#grad-active)" stroke="rgba(34,197,94,0.35)" stroke-width="1" filter="url(#glow-green)"/>
+    <circle cx="68" cy="82" r="5" fill="#22c55e"/>
+    <text x="80" y="78" fill="#22c55e" font-size="12" font-weight="700">LLMClient</text>
+    <text x="80" y="93" fill="rgba(255,255,255,0.4)" font-size="9">Claude Opus 4.6 API</text>
+
+    <rect x="240" y="58" width="195" height="48" rx="10" fill="url(#grad-active)" stroke="rgba(34,197,94,0.35)" stroke-width="1" filter="url(#glow-green)"/>
+    <circle cx="258" cy="82" r="5" fill="#22c55e"/>
+    <text x="270" y="78" fill="#22c55e" font-size="12" font-weight="700">OntologyGenerator</text>
+    <text x="270" y="93" fill="rgba(255,255,255,0.4)" font-size="9">패션 도메인 엔티티 정의</text>
+
+    <!-- Planned modules (orange, dimmer) -->
+    <rect x="450" y="58" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="468" cy="82" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="480" y="78" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">GraphBuilder</text>
+    <text x="480" y="93" fill="rgba(255,255,255,0.25)" font-size="9">Zep 지식그래프 (M2)</text>
+
+    <rect x="650" y="58" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="668" cy="82" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="680" y="78" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">SimulationRunner</text>
+    <text x="680" y="93" fill="rgba(255,255,255,0.25)" font-size="9">OASIS 에이전트 (M3)</text>
+
+    <rect x="50" y="118" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="68" cy="142" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="80" y="138" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">ProfileGenerator</text>
+    <text x="80" y="153" fill="rgba(255,255,255,0.25)" font-size="9">에이전트 프로필 (M3)</text>
+
+    <rect x="250" y="118" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="268" cy="142" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="280" y="138" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">ReportAgent</text>
+    <text x="280" y="153" fill="rgba(255,255,255,0.25)" font-size="9">ReACT 분석 (M5)</text>
+
+    <rect x="450" y="118" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="468" cy="142" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="480" y="138" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">MemoryUpdater</text>
+    <text x="480" y="153" fill="rgba(255,255,255,0.25)" font-size="9">에이전트 기억 (M5)</text>
+
+    <rect x="650" y="118" width="185" height="48" rx="10" fill="url(#grad-planned)" stroke="rgba(245,158,11,0.2)" stroke-width="1"/>
+    <circle cx="668" cy="142" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="680" y="138" fill="rgba(245,158,11,0.6)" font-size="11" font-weight="600">EntityReader</text>
+    <text x="680" y="153" fill="rgba(255,255,255,0.25)" font-size="9">엔티티 추출 (M2)</text>
+
+    <!-- ===== ARROWS: Core → M1 Modules ===== -->
+    <line x1="137" y1="106" x2="137" y2="235" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-green)" opacity="0.7"/>
+    <line x1="337" y1="106" x2="450" y2="235" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-green)" opacity="0.7"/>
+    <line x1="137" y1="106" x2="700" y2="235" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6,4" marker-end="url(#arrow-green)" opacity="0.5"/>
+
+    <!-- Label on arrows -->
+    <text x="90" y="210" fill="rgba(34,197,94,0.5)" font-size="9" font-weight="600">import</text>
+    <text x="370" y="210" fill="rgba(34,197,94,0.5)" font-size="9" font-weight="600">import</text>
+    <text x="550" y="210" fill="rgba(34,197,94,0.5)" font-size="9" font-weight="600">import</text>
+
+    <!-- ===== LAYER 2: Module 1 Files ===== -->
+    <text x="50" y="260" fill="rgba(139,92,246,0.7)" font-size="11" font-weight="700" letter-spacing="0.1em">MODULE 1 — CAMPAIGN PRE-TEST</text>
+
+    <!-- campaign_seed.py -->
+    <rect x="30" y="272" width="240" height="95" rx="12" fill="url(#grad-m1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+    <text x="50" y="296" fill="rgba(139,92,246,0.9)" font-size="12" font-weight="700">campaign_seed.py</text>
+    <text x="50" y="314" fill="rgba(255,255,255,0.5)" font-size="10">브랜드 DB + 템플릿 조합</text>
+    <text x="50" y="330" fill="rgba(255,255,255,0.35)" font-size="9">LLM 호출 없음 (순수 템플릿)</text>
+    <rect x="50" y="340" width="80" height="18" rx="9" fill="rgba(255,255,255,0.06)"/>
+    <text x="65" y="353" fill="rgba(255,255,255,0.4)" font-size="8" font-weight="600">NO LLM</text>
+
+    <!-- consumer_profiles.py -->
+    <rect x="290" y="272" width="270" height="95" rx="12" fill="url(#grad-m1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+    <text x="310" y="296" fill="rgba(139,92,246,0.9)" font-size="12" font-weight="700">consumer_profiles.py</text>
+    <text x="310" y="314" fill="rgba(255,255,255,0.5)" font-size="10">아키타입 가중치 → 페르소나 생성</text>
+    <text x="310" y="330" fill="rgba(255,255,255,0.35)" font-size="9">LLMClient로 Claude 호출 (temp=0.8)</text>
+    <rect x="310" y="340" width="105" height="18" rx="9" fill="rgba(34,197,94,0.15)"/>
+    <text x="325" y="353" fill="#22c55e" font-size="8" font-weight="700">LLMClient ●</text>
+
+    <!-- campaign_scorer.py -->
+    <rect x="580" y="272" width="270" height="95" rx="12" fill="url(#grad-m1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+    <text x="600" y="296" fill="rgba(139,92,246,0.9)" font-size="12" font-weight="700">campaign_scorer.py</text>
+    <text x="600" y="314" fill="rgba(255,255,255,0.5)" font-size="10">반응 시뮬 + KPI 집계 + 리스크</text>
+    <text x="600" y="330" fill="rgba(255,255,255,0.35)" font-size="9">배치 5명/호출 (temp=0.7) + 통계 계산</text>
+    <rect x="600" y="340" width="105" height="18" rx="9" fill="rgba(34,197,94,0.15)"/>
+    <text x="615" y="353" fill="#22c55e" font-size="8" font-weight="700">LLMClient ●</text>
+    <rect x="715" y="340" width="70" height="18" rx="9" fill="rgba(59,130,246,0.15)"/>
+    <text x="726" y="353" fill="rgba(59,130,246,0.8)" font-size="8" font-weight="700">Python</text>
+
+    <!-- ===== ARROWS: M1 → Outputs ===== -->
+    <line x1="150" y1="367" x2="150" y2="415" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="425" y1="367" x2="425" y2="415" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <line x1="715" y1="367" x2="715" y2="415" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+    <!-- ===== LAYER 3: Outputs ===== -->
+    <rect x="55" y="420" width="190" height="50" rx="10" fill="url(#grad-output)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+    <text x="90" y="443" fill="#22c55e" font-size="11" font-weight="700">CampaignSeed</text>
+    <text x="90" y="458" fill="rgba(255,255,255,0.35)" font-size="9">seed_text (799자)</text>
+
+    <rect x="330" y="420" width="190" height="50" rx="10" fill="url(#grad-output)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+    <text x="360" y="443" fill="#22c55e" font-size="11" font-weight="700">ConsumerPanel</text>
+    <text x="360" y="458" fill="rgba(255,255,255,0.35)" font-size="9">5명 페르소나 프로필</text>
+
+    <rect x="615" y="420" width="200" height="50" rx="10" fill="url(#grad-output)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+    <text x="645" y="443" fill="#22c55e" font-size="11" font-weight="700">CampaignReport</text>
+    <text x="645" y="458" fill="rgba(255,255,255,0.35)" font-size="9">KPI + 리스크 + 추천</text>
+
+    <!-- Chained arrows between outputs -->
+    <line x1="245" y1="445" x2="330" y2="445" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+    <line x1="520" y1="445" x2="615" y2="445" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#arrow)"/>
+
+    <!-- ===== LEGEND ===== -->
+    <rect x="30" y="490" width="840" height="25" rx="6" fill="rgba(255,255,255,0.02)"/>
+    <circle cx="60" cy="502" r="5" fill="#22c55e"/>
+    <text x="72" y="507" fill="rgba(255,255,255,0.5)" font-size="10">활성 사용 (M1)</text>
+    <circle cx="210" cy="502" r="5" fill="none" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="222" y="507" fill="rgba(255,255,255,0.5)" font-size="10">향후 활성화 (M2~M5)</text>
+    <rect x="390" y="495" width="12" height="12" rx="3" fill="url(#grad-m1)" stroke="rgba(139,92,246,0.3)" stroke-width="1"/>
+    <text x="410" y="507" fill="rgba(255,255,255,0.5)" font-size="10">Module 1 파일</text>
+    <rect x="540" y="495" width="12" height="12" rx="3" fill="url(#grad-output)" stroke="rgba(34,197,94,0.25)" stroke-width="1"/>
+    <text x="560" y="507" fill="rgba(255,255,255,0.5)" font-size="10">출력 데이터</text>
+    <line x1="670" y1="502" x2="700" y2="502" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="6,4"/>
+    <text x="710" y="507" fill="rgba(255,255,255,0.5)" font-size="10">import 연결</text>
+  </svg>
+</div>
+
+<details>
+  <summary>MiroFish 원본 vs F&amp;F 적용 비교</summary>
+  <div class="detail-content">
+    <table>
+      <tr><th>관점</th><th>MiroFish (원본)</th><th>F&amp;F Marketing Sim (적용)</th></tr>
+      <tr>
+        <td><strong>도메인</strong></td>
+        <td>여론/사회 이슈 시뮬레이션<br>(정치, 대학 분쟁, 소설 결말 예측)</td>
+        <td>패션 마케팅 캠페인 사전 테스트<br>(브랜드 반응, 인플루언서, 트렌드)</td>
+      </tr>
+      <tr>
+        <td><strong>에이전트</strong></td>
+        <td>Twitter/Reddit 사용자<br>(실제 소셜미디어 행동 시뮬)</td>
+        <td>한국 패션 소비자 아키타입<br>(MZ세대, 학생, 직장인, 패션마니아, 가성비)</td>
+      </tr>
+      <tr>
+        <td><strong>지식그래프</strong></td>
+        <td>뉴스/보고서에서 자동 추출<br>(Zep Cloud GraphRAG)</td>
+        <td>F&amp;F 브랜드/경쟁사/트렌드 데이터<br>(현재 수동 정의, Zep 연동 계획)</td>
+      </tr>
+      <tr>
+        <td><strong>시뮬레이션</strong></td>
+        <td>OASIS 프레임워크<br>(수천~100만 에이전트, 멀티플랫폼)</td>
+        <td>M1: LLM 기반 경량 시뮬 (5~15명)<br>M3+: OASIS 풀 시뮬레이션 예정</td>
+      </tr>
+      <tr>
+        <td><strong>출력</strong></td>
+        <td>ReACT 리포트 에이전트<br>(도구 호출 + 반성 루프)</td>
+        <td>M1: HTML 리포트 + JSON<br>M5: ReACT 리포트 에이전트 예정</td>
+      </tr>
+      <tr>
+        <td><strong>LLM</strong></td>
+        <td>Qwen-Plus (알리바바 DashScope)</td>
+        <td>Claude Opus 4.6 (Anthropic)<br>OpenAI SDK 호환 레이어</td>
+      </tr>
+    </table>
+  </div>
+</details>
+
+<details>
+  <summary>모듈 로드맵 — MiroFish 기능 순차 활성화</summary>
+  <div class="detail-content">
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:8px; font-size:0.8rem; text-align:center;">
+      <div class="card" style="border-color:var(--green); padding:0.8rem;">
+        <div style="font-weight:700; color:var(--green);">M1</div>
+        <div>캠페인 사전테스트</div>
+        <div style="margin-top:6px;">
+          <span class="tag tag-green" style="font-size:0.7rem;">LLMClient</span><br>
+          <span class="tag tag-green" style="font-size:0.7rem;">OntologyGen</span>
+        </div>
+        <div style="color:var(--green); font-size:0.7rem; margin-top:4px;">완료</div>
+      </div>
+      <div class="card" style="border-color:var(--accent); padding:0.8rem;">
+        <div style="font-weight:700; color:var(--accent);">M2</div>
+        <div>트렌드 예측</div>
+        <div style="margin-top:6px;">
+          <span class="tag" style="font-size:0.7rem;">GraphBuilder</span><br>
+          <span class="tag" style="font-size:0.7rem;">EntityReader</span>
+        </div>
+        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:4px;">계획</div>
+      </div>
+      <div class="card" style="border-color:var(--accent2); padding:0.8rem;">
+        <div style="font-weight:700; color:var(--accent2);">M3</div>
+        <div>인플루언서 시뮬</div>
+        <div style="margin-top:6px;">
+          <span class="tag" style="font-size:0.7rem;">OASIS Runner</span><br>
+          <span class="tag" style="font-size:0.7rem;">ProfileGen</span><br>
+          <span class="tag" style="font-size:0.7rem;">SimConfig</span>
+        </div>
+        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:4px;">계획</div>
+      </div>
+      <div class="card" style="border-color:var(--accent2); padding:0.8rem;">
+        <div style="font-weight:700; color:var(--accent2);">M4</div>
+        <div>시장 진입</div>
+        <div style="margin-top:6px;">
+          <span class="tag" style="font-size:0.7rem;">GraphBuilder</span><br>
+          <span class="tag" style="font-size:0.7rem;">SimConfig</span>
+        </div>
+        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:4px;">계획</div>
+      </div>
+      <div class="card" style="border-color:var(--orange); padding:0.8rem;">
+        <div style="font-weight:700; color:var(--orange);">M5</div>
+        <div>경쟁사 워게이밍</div>
+        <div style="margin-top:6px;">
+          <span class="tag" style="font-size:0.7rem;">ReportAgent</span><br>
+          <span class="tag" style="font-size:0.7rem;">MemoryUpdater</span><br>
+          <span class="tag" style="font-size:0.7rem;">OASIS Full</span>
+        </div>
+        <div style="color:var(--text-dim); font-size:0.7rem; margin-top:4px;">계획</div>
+      </div>
+    </div>
+    <div class="formula" style="margin-top:1rem;">
+      <strong>활용률:</strong> 11개 코어 모듈 중 현재 <span class="result">2개 활성</span> (18%) &rarr; M3 완료 시 <span style="color:var(--accent);">8개 활성</span> (73%) &rarr; M5 완료 시 <span style="color:var(--green);">11개 전체 활성</span> (100%)
+    </div>
+  </div>
+</details>
+
+<h2>근거 데이터 대시보드</h2>
+<p style="color:var(--text-dim);">이 리포트의 모든 데이터 출처와 실제/가상 여부를 투명하게 공개합니다.</p>
+
+<div class="card card-orange">
+  <h3 style="color:var(--orange);">&#9888; 데이터 신뢰도 안내</h3>
+  <p>현재 PoC 단계로, <strong>실제 F&amp;F 시스템과 연결되지 않은 가상 데이터</strong>를 사용합니다.</p>
+  <table>
+    <tr><th>데이터 유형</th><th>출처</th><th>신뢰도</th><th>프로덕션 연결 시</th></tr>
+    <tr><td>캠페인 브리프 (제품, 가격, 메시지)</td><td>test_campaign.json (PoC용 가상 데이터)</td><td><span class="tag tag-red">가상</span></td><td>마케팅팀 브리프 DB / Notion</td></tr>
+    <tr><td>브랜드 메타데이터</td><td>shared/fnf_brands.py (하드코딩)</td><td><span class="tag tag-orange">수동 정의</span></td><td>fnf_kg (Snowflake KG)</td></tr>
+    <tr><td>소비자 아키타입 설정</td><td>shared/korean_config.py (하드코딩)</td><td><span class="tag tag-orange">수동 정의</span></td><td>fnf_enter 크롤 데이터 기반 보정</td></tr>
+    <tr><td>페르소나 &amp; 반응</td><td>Claude Opus 4.6 (LLM 생성)</td><td><span class="tag tag-red">AI 추정</span></td><td>실제 소비자 설문/FGI로 검증</td></tr>
+    <tr><td>KPI 수치</td><td>Python 통계 계산</td><td><span class="tag tag-green">계산값</span></td><td>과거 캠페인 실적 대비 백테스트</td></tr>
+  </table>
+</div>
+
+<details>
+  <summary>&#128202; 캠페인 브리프 입력 데이터 (사용자 입력)</summary>
+  <div class="detail-content">
+    <p>API에 전달된 원본 JSON 데이터입니다. 이 값들이 전체 분석의 시작점입니다.</p>
+    <table>
+      <tr><th>필드</th><th>값</th><th>출처</th><th>파일</th></tr>
+    <tr><td><code>brand</code></td><td>MLB</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>product_name</code></td><td>2026 SS NYC Monogram Mini Backpack</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>product_description</code></td><td>NYC Yankees monogram mini backpack. Lightweight nylon, detachable crossbody strap. 89000 KRW.</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터 (가격 포함)</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>target_audience</code></td><td>20s female, K-POP fans, college students</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>campaign_message</code></td><td>Your City, Your Style</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>season</code></td><td>SS</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+    <tr><td><code>campaign_type</code></td><td>launch</td><td><span class="tag tag-orange">PoC 테스트용 가상 데이터</span></td><td><code>test_campaign.json</code></td></tr>
+
+    </table>
+    <pre>
+// test_campaign.json (API 호출 시 전달된 원본)
+{
+  "brand": "MLB",
+  "product_name": "2026 SS NYC Monogram Mini Backpack",
+  "product_description": "NYC Yankees monogram mini backpack. Lightweight nylon, detachable crossbody strap. 89000 KRW.",
+  "target_audience": "20s female, K-POP fans, college students",
+  "campaign_message": "Your City, Your Style",
+  "season": "SS",
+  "campaign_type": "launch"
+}</pre>
+  </div>
+</details>
+
+<details>
+  <summary>&#127959; 브랜드 DB: MLB (하드코딩 — shared/fnf_brands.py)</summary>
+  <div class="detail-content">
+    <p><code>FNF_BRANDS["MLB"]</code>에서 로드된 브랜드 메타데이터입니다.</p>
+    <table>
+      <tr><th>항목</th><th>값</th></tr>
+    <tr><td>브랜드 코드</td><td>M</td></tr>
+    <tr><td>한국명</td><td>엠엘비</td></tr>
+    <tr><td>카테고리</td><td>streetwear</td></tr>
+    <tr><td>포지셔닝</td><td>K-스트릿 캐주얼</td></tr>
+    <tr><td>타겟 연령</td><td>15-35</td></tr>
+    <tr><td>키워드</td><td>스트릿, 캐주얼, 뉴욕 양키스, 모노그램, 청춘, K-POP</td></tr>
+    <tr><td>경쟁사</td><td>New Era, Nike SB, Stussy, Thrasher</td></tr>
+    <tr><td>주요 제품</td><td>모자, 패딩, 맨투맨, 백팩, 청키 신발</td></tr>
+    <tr><td>브랜드 성격</td><td>젊고 트렌디한 스트릿 감성. K-POP 스타와 MZ세대의 일상 패션.</td></tr>
+    <tr><td>가격대</td><td>mid</td></tr>
+    <tr><td>시장</td><td>Korea, China, Southeast Asia, Japan</td></tr>
+
+    </table>
+    <div class="formula">
+      출처: <code>shared/fnf_brands.py</code> (수동 정의)<br>
+      프로덕션: <code>fnf_kg</code> Snowflake KG에서 실시간 조회로 교체 필요
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>&#128101; 소비자 아키타입 설정 (하드코딩 — shared/korean_config.py)</summary>
+  <div class="detail-content">
+    <p>한국 패션 시장 소비자를 5가지 아키타입으로 분류한 설정값입니다.</p>
+    <table style="font-size:0.82rem;">
+      <tr><th>아키타입</th><th>연령대</th><th>특징</th><th>주 플랫폼</th><th>패션관심</th><th>가격민감</th><th>충성도</th></tr>
+    <tr><td>MZ 트렌드세터</td><td>20-29</td><td>패션 트렌드에 민감한 MZ세대. SNS 활발, 신제품 얼리어답터....</td><td>Instagram, TikTok, YouTube</td><td>high</td><td>medium</td><td>low</td></tr>
+    <tr><td>직장인</td><td>30-45</td><td>실용성과 스타일 균형. 주말 아웃도어 활동, 브랜드 충성도 높음....</td><td>Instagram, Naver Blog</td><td>medium</td><td>medium</td><td>high</td></tr>
+    <tr><td>학생</td><td>15-22</td><td>또래 영향력 크고, 가성비 중시. K-POP 팬덤 활발....</td><td>TikTok, Instagram, YouTube</td><td>high</td><td>high</td><td>low</td></tr>
+    <tr><td>패션 마니아</td><td>22-38</td><td>패션을 취미이자 자기표현으로. 하이엔드~스트릿 넘나듦. 리뷰/언박싱 생산....</td><td>Instagram, YouTube, Naver Cafe</td><td>very_high</td><td>low</td><td>medium</td></tr>
+    <tr><td>가성비 소비자</td><td>25-50</td><td>가격 대비 품질 중시. 할인/프로모션에 민감. 실용 위주....</td><td>Naver Cafe, Coupang Review</td><td>low-medium</td><td>very_high</td><td>medium</td></tr>
+
+    </table>
+    <div class="formula">
+      출처: <code>shared/korean_config.py</code> (수동 정의)<br>
+      프로덕션: <code>fnf_enter</code> 실제 SNS 크롤 데이터의 오디언스 인사이트로 보정 필요
+    </div>
+  </div>
+</details>
+
+<details>
+  <summary>&#129302; 생성된 데이터 계보 (AI 생성 vs 계산)</summary>
+  <div class="detail-content">
+    <p>각 결과물이 어떤 방법으로 생성되었는지 추적합니다.</p>
+    <table>
+      <tr><th>결과물</th><th>내용</th><th>생성 방법</th><th>상세</th></tr>
+    <tr><td>페르소나 프로필</td><td style="font-size:0.82rem;">5명 (이름, 나이, 직업, 성격...)</td><td><span class="tag tag-red">AI 생성</span></td><td style="font-size:0.82rem; color:var(--text-dim);">LLM이 브리프+아키타입을 기반으로 창작</td></tr>
+    <tr><td>반응 시뮬레이션</td><td style="font-size:0.82rem;">참여율, 감성, 공유확률, 구매의향, SNS 반응</td><td><span class="tag tag-red">AI 생성</span></td><td style="font-size:0.82rem; color:var(--text-dim);">LLM이 페르소나 역할극으로 반응 추정</td></tr>
+    <tr><td>KPI 집계</td><td style="font-size:0.82rem;">참여율 83%, 감성 +0.63, 바이럴 60%...</td><td><span class="tag tag-green">계산</span></td><td style="font-size:0.82rem; color:var(--text-dim);">개별 반응값의 산술 평균/카운팅</td></tr>
+    <tr><td>리스크 플래그</td><td style="font-size:0.82rem;">가격 민감도 리스크</td><td><span class="tag tag-green">계산</span></td><td style="font-size:0.82rem; color:var(--text-dim);">5가지 임계값 규칙으로 자동 판정</td></tr>
+    <tr><td>추천사항</td><td style="font-size:0.82rem;">3가지 실행 가능한 제안</td><td><span class="tag tag-red">AI 생성</span></td><td style="font-size:0.82rem; color:var(--text-dim);">KPI 결과를 LLM에 제공하여 생성</td></tr>
+
+    </table>
+    <div class="formula" style="border-color: var(--red);">
+      <strong style="color:var(--red);">&#9888; AI 생성 데이터 주의</strong><br>
+      <span class="tag tag-red">AI 생성</span> 표시된 항목은 Claude Opus 4.6의 학습 패턴 기반 추정이며,<br>
+      실제 시장 데이터가 아닙니다. 의사결정 참고용으로만 활용하세요.
+    </div>
+  </div>
+</details>
+<h2>Agent 숙의 파이프라인</h2>
+<div class="pipeline">
+  <div class="pipe-step"><div class="step-num">STEP 1</div><div class="step-label">Seed 생성</div><div class="step-type">템플릿</div></div>
+  <div class="pipe-arrow">&rarr;</div>
+  <div class="pipe-step"><div class="step-num">STEP 2</div><div class="step-label">패널 구성</div><div class="step-type">LLM</div></div>
+  <div class="pipe-arrow">&rarr;</div>
+  <div class="pipe-step"><div class="step-num">STEP 3</div><div class="step-label">반응 시뮬</div><div class="step-type">LLM</div></div>
+  <div class="pipe-arrow">&rarr;</div>
+  <div class="pipe-step"><div class="step-num">STEP 4</div><div class="step-label">KPI 집계</div><div class="step-type">통계</div></div>
+  <div class="pipe-arrow">&rarr;</div>
+  <div class="pipe-step"><div class="step-num">STEP 5</div><div class="step-label">리스크 감지</div><div class="step-type">규칙</div></div>
+  <div class="pipe-arrow">&rarr;</div>
+  <div class="pipe-step"><div class="step-num">STEP 6</div><div class="step-label">추천 생성</div><div class="step-type">LLM</div></div>
+</div>
+
+<h2>Step 1: Seed 생성 (템플릿 조합, LLM 없음)</h2>
+<div class="card card-accent">
+  <h3>입력된 캠페인 브리프</h3>
+  <table>
+    <tr><th>항목</th><th>값</th></tr>
+    <tr><td>브랜드</td><td><strong>MLB</strong></td></tr>
+    <tr><td>제품</td><td>2026 SS NYC Monogram Mini Backpack</td></tr>
+    <tr><td>설명</td><td>NYC Yankees monogram mini backpack. Lightweight nylon, detachable crossbody strap. 89000 KRW.</td></tr>
+    <tr><td>타겟</td><td>20s female, K-POP fans, college students</td></tr>
+    <tr><td>메시지</td><td>"Your City, Your Style"</td></tr>
+    <tr><td>시즌</td><td>SS (봄/여름)</td></tr>
+    <tr><td>유형</td><td>launch</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h3>Seed 생성 로직</h3>
+  <p>LLM을 호출하지 않고 순수 템플릿 조합으로 생성합니다:</p>
+  <pre>
+1. FNF_BRANDS["MLB"] 에서 브랜드 메타데이터 로드
+   &rarr; 포지셔닝, 경쟁사, 가격대, 주요 시장 등
+
+2. templates/brand_contexts.json 에서 브랜드 소개문 + 시즌 키워드 추출
+   &rarr; SS 시즌 키워드 포함
+
+3. 5개 섹션을 조합하여 ~800자 seed_text 생성:
+   [브랜드 개요] + [제품 정보] + [캠페인 브리프] + [시장 컨텍스트] + [추가 컨텍스트]
+
+4. get_archetype_distribution("MLB") 로 소비자 아키타입 가중치 로드
+</pre>
+</div>
+
+<h2>Step 2: 소비자 패널 구성 (LLM 기반)</h2>
+
+<div class="card card-accent">
+  <h3>아키타입 가중치 &rarr; 인원 배분</h3>
+  <p>MLB 브랜드의 타겟 소비자 분포에 따라 패널을 구성합니다:</p>
+  <table>
+    <tr><th>아키타입</th><th>가중치</th><th>가중치 &times; 5</th><th>실제 배분</th></tr>
+    <tr><td>MZ 트렌드세터</td><td>35%</td><td>1.75</td><td><strong>2명</strong></td></tr>
+    <tr><td>학생</td><td>30%</td><td>1.50</td><td><strong>2명</strong></td></tr>
+    <tr><td>패션 마니아</td><td>15%</td><td>0.75</td><td><strong>1명</strong></td></tr>
+    <tr><td>직장인</td><td>10%</td><td>0.50</td><td><strong>0명</strong></td></tr>
+    <tr><td>가성비 소비자</td><td>10%</td><td>0.50</td><td><strong>0명</strong></td></tr>
+
+  </table>
+  <div class="formula">
+    배분 로직: floor(가중치 &times; 패널크기) 후, 소수점이 큰 순서대로 나머지 1명씩 추가
+  </div>
+</div>
+
+<details>
+  <summary>LLM 프롬프트 (소비자 생성용)</summary>
+  <div class="detail-content">
+    <h3>System Prompt</h3>
+    <pre>당신은 한국 패션 시장의 소비자 페르소나 생성 전문가입니다.
+다음 아키타입에 맞는 가상 소비자 N명을 생성하세요.
+
+아키타입: [MZ 트렌드세터 / 학생 / 패션 마니아 / ...]
+연령대: [20-29 / 15-22 / ...]
+특징: [한국 시장 아키타입 설명]
+행동 특성: [early_adopter, social_sharer, ...]
+SNS 스타일: [비주얼 중심, 해시태그 활용, ...]
+
+브랜드: MLB
+캠페인: Your City, Your Style
+제품: 2026 SS NYC Monogram Mini Backpack
+타겟: 20s female, K-POP fans, college students</pre>
+    <h3>User Prompt</h3>
+    <pre>JSON 배열 형식으로 N명의 페르소나를 생성하세요.
+각 페르소나: name, age, gender, occupation, personality,
+fashion_preferences, social_media_habits, brand_awareness,
+price_sensitivity, influence_level
+
+temperature=0.8 (다양성 확보) | max_tokens=4096 | 파싱 실패 시 2회 재시도</pre>
+  </div>
+</details>
+
+<h3>생성된 소비자 패널 (5명)</h3>
+
+    <div class="persona-card">
+      <div class="persona-avatar">🔥</div>
+      <div>
+        <strong>윤서진</strong>
+        <span class="tag">p01</span>
+        <span class="tag">MZ 트렌드세터</span>
+        <span style="color:var(--text-dim); font-size:0.85rem;"> &middot; 24세 여성 &middot; 서울 소재 4년제 대학교 시각디자인과 4학년 / 패션 콘텐츠 크리에이터 (인스타그램 팔로워</span>
+        <div style="margin-top:6px; font-size:0.85rem; color:var(--text-dim);">호기심이 강하고 새로운 트렌드를 누구보다 빠르게 캐치하는 성격으로, 자신만의 스타일링을 만들어 공유하는 것에 큰 보람을 느낀다. 완벽주의적 성향이 있어 OOTD 한 장을 찍기 위해 조명과 구도에 상당한 시간을 투자하며, 주변 친구들이 '서진이한테 물어보면 된다'고 할 ...</div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-avatar">🔥</div>
+      <div>
+        <strong>정하윤</strong>
+        <span class="tag">p02</span>
+        <span class="tag">MZ 트렌드세터</span>
+        <span style="color:var(--text-dim); font-size:0.85rem;"> &middot; 22세 여성 &middot; 인천 소재 대학교 경영학과 2학년 / 대형 카페 주말 아르바이트생</span>
+        <div style="margin-top:6px; font-size:0.85rem; color:var(--text-dim);">밝고 사교적인 ENFP 성향으로 새로운 사람을 만나고 다양한 경험을 하는 것을 좋아한다. K-POP 팬덤 활동(르세라핌 팬)을 통해 패션에 관심을 갖게 되었으며, 아이돌이 입은 옷을 합리적인 가격대에서 비슷하게 재현하는 '영감 스타일링'에 능하다. 계획적으로 소비하려 ...</div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-avatar">📚</div>
+      <div>
+        <strong>윤서연</strong>
+        <span class="tag">p03</span>
+        <span class="tag">학생</span>
+        <span style="color:var(--text-dim); font-size:0.85rem;"> &middot; 20세 여성 &middot; 서울 소재 4년제 대학교 시각디자인학과 2학년 / 학교 근처 카페 주말 아르바이트</span>
+        <div style="margin-top:6px; font-size:0.85rem; color:var(--text-dim);">호기심이 많고 트렌드에 민감하며, 새로운 스타일을 시도하는 데 거리낌이 없는 성격이다. 친구들 사이에서 '패션 참고서' 역할을 하며 자연스럽게 주변의 소비 결정에 영향을 주지만, 본인은 충동구매보다는 가성비를 꼼꼼히 따지는 편이다. ENHYPEN 팬으로 팬덤 활동에 적...</div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-avatar">📚</div>
+      <div>
+        <strong>정하은</strong>
+        <span class="tag">p04</span>
+        <span class="tag">학생</span>
+        <span style="color:var(--text-dim); font-size:0.85rem;"> &middot; 17세 여성 &middot; 경기도 소재 일반계 고등학교 2학년 / 교내 댄스 동아리 부장</span>
+        <div style="margin-top:6px; font-size:0.85rem; color:var(--text-dim);">밝고 에너지가 넘치며, 또래 그룹 안에서 분위기 메이커 역할을 한다. 유행에 빠르게 반응하지만 스스로 트렌드를 만들기보다는 SNS에서 본 인기 아이템을 빠르게 따라 사는 '패스트 팔로워' 성향이 강하다. 르세라핌의 열성 팬으로, 학교 축제 댄스 커버 무대를 준비할 때 ...</div>
+      </div>
+    </div>
+    <div class="persona-card">
+      <div class="persona-avatar">👗</div>
+      <div>
+        <strong>윤서진</strong>
+        <span class="tag">p05</span>
+        <span class="tag">패션 마니아</span>
+        <span style="color:var(--text-dim); font-size:0.85rem;"> &middot; 26세 여성 &middot; 패션 전문 유튜버 겸 프리랜서 스타일리스트</span>
+        <div style="margin-top:6px; font-size:0.85rem; color:var(--text-dim);">트렌드를 단순히 따라가는 것이 아니라 자신만의 해석을 더해 재구성하는 것을 즐기는 분석적이면서도 창의적인 성격. 새로운 브랜드나 제품을 발견하면 반드시 직접 착용해보고 디테일까지 파헤쳐야 직성이 풀리는 완벽주의 기질이 있다. 자신의 의견을 솔직하게 표현하되, 팔로워들과...</div>
+      </div>
+    </div>
+
+<h2>Step 3: 반응 시뮬레이션 (LLM 기반)</h2>
+
+<div class="card card-accent">
+  <h3>시뮬레이션 방식</h3>
+  <p>각 페르소나에게 캠페인 정보를 보여주고, LLM이 해당 인물의 관점에서 반응을 시뮬레이션합니다.</p>
+  <div class="formula">
+    배치 처리: 5명을 5명씩 묶어 1회 LLM 호출<br>
+    temperature=0.7 (현실적 다양성) | "모든 사람이 긍정적일 필요는 없습니다" 지시
+  </div>
+</div>
+
+<details>
+  <summary>LLM 프롬프트 (반응 시뮬레이션용)</summary>
+  <div class="detail-content">
+    <pre>
+[System] 당신은 한국 패션 마케팅 소비자 반응 시뮬레이터입니다.
+각 소비자가 아래 캠페인을 접했을 때의 반응을 시뮬레이션하세요.
+현실적이고 다양한 반응을 생성하세요. 모든 사람이 긍정적일 필요는 없습니다.
+
+[User] 캠페인 정보 + 각 페르소나의 프로필 요약을 제공
+&rarr; 각 페르소나별로:
+   engagement_likelihood (0-1), sentiment, sentiment_score (-1~1),
+   share_probability (0-1), purchase_intent (0-1),
+   reaction_text (SNS 반응), concerns[], appeal_points[]</pre>
+  </div>
+</details>
+
+<h3>개별 페르소나 반응 상세</h3>
+
+    <details>
+      <summary>p01 윤서진 (MZ 트렌드세터) &mdash; 참여 93% | 감성 <span style="color:#22c55e">매우 긍정</span> | 공유 91% | 구매 82%</summary>
+      <div class="detail-content">
+        <div class="reaction-text">&ldquo;NYC 모노그램 미니백팩 드디어 나온다🖤 이번 SS 라벤더 톤 코디에 크로스로 매면 피드 분위기 완벽할 듯! 근데 마리떼 새 크로스백이랑 좀 고민되긴 해… 일단 실물 보고 언박싱 콘텐츠 먼저 찍어야지.&rdquo;</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <strong>참여 가능성</strong>
+            <div class="bar"><div class="bar-fill" style="width:93%; background:hsl(111, 70%, 50%);">93%</div></div>
+            <strong>공유 확률</strong>
+            <div class="bar"><div class="bar-fill" style="width:91%; background:hsl(109, 70%, 50%);">91%</div></div>
+            <strong>구매 의향</strong>
+            <div class="bar"><div class="bar-fill" style="width:82%; background:hsl(98, 70%, 50%);">82%</div></div>
+            <strong>감성</strong>
+            <div class="bar"><div class="bar-fill" style="width:92%; background:#22c55e;">매우 긍정 (+0.85)</div></div>
+          </div>
+          <div>
+            <strong style="color:var(--green);">매력 포인트</strong><br><span class="tag tag-green">모노그램 로고 플레이가 피드 구성에 최적화된 비주얼</span> <span class="tag tag-green">미니백팩+크로스바디 탈착 스트랩의 스타일링 다양성</span> <span class="tag tag-green">NYC 감성이 본인의 시티 캐주얼 무드와 정확히 부합</span>
+            <br><br>
+            <strong style="color:var(--orange);">우려사항</strong><br><span class="tag tag-orange">마리떼프랑소와저버·디스이즈네버댓 SS 라인업과의 비교 검토 중</span> <span class="tag tag-orange">모노그램 디자인이 기존 라인과 얼마나 차별화되는지 실물 확인 필요</span> <span class="tag tag-orange">89000원이 콘텐츠 활용 가치 대비 적정한지 계산 중</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>p02 정하윤 (MZ 트렌드세터) &mdash; 참여 85% | 감성 <span style="color:#86efac">긍정</span> | 공유 72% | 구매 58%</summary>
+      <div class="detail-content">
+        <div class="reaction-text">&ldquo;카즈하가 들었던 그 모노그램 백 미니백팩 버전 나왔어?! 😭💕 너무 갖고 싶은데 89000원이면 알바 3번 뛰어야 하는 금액이라… 혹시 런칭 쿠폰이나 카드 할인 있으면 누가 좀 알려줘ㅠㅠ&rdquo;</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <strong>참여 가능성</strong>
+            <div class="bar"><div class="bar-fill" style="width:85%; background:hsl(102, 70%, 50%);">85%</div></div>
+            <strong>공유 확률</strong>
+            <div class="bar"><div class="bar-fill" style="width:72%; background:hsl(86, 70%, 50%);">72%</div></div>
+            <strong>구매 의향</strong>
+            <div class="bar"><div class="bar-fill" style="width:58%; background:hsl(69, 70%, 50%);">58%</div></div>
+            <strong>감성</strong>
+            <div class="bar"><div class="bar-fill" style="width:84%; background:#86efac;">긍정 (+0.68)</div></div>
+          </div>
+          <div>
+            <strong style="color:var(--green);">매력 포인트</strong><br><span class="tag tag-green">르세라핌·K-POP 아이돌 연계 브랜드 이미지에 강한 호감</span> <span class="tag tag-green">NYC 아메리칸 캐주얼 무드가 현재 취향과 일치</span> <span class="tag tag-green">미니백팩의 다용도 실용성(학교·카페·놀이공원)</span>
+            <br><br>
+            <strong style="color:var(--orange);">우려사항</strong><br><span class="tag tag-orange">89000원이 월 예산 대비 상당한 부담</span> <span class="tag tag-orange">할인 프로모션이나 카드 혜택 없이는 즉시 구매 어려움</span> <span class="tag tag-orange">비슷한 가격대에서 다른 브랜드 대안도 고려 가능</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>p03 윤서연 (학생) &mdash; 참여 80% | 감성 <span style="color:#86efac">긍정</span> | 공유 55% | 구매 50%</summary>
+      <div class="detail-content">
+        <div class="reaction-text">&ldquo;위시리스트에 넣어둔 NYC 모노그램 미니백팩 실물 후기 올라오기 시작했다👀 디자인은 진짜 내 취향인데 89000원이면 무신사 할인이나 공홈 런칭 쿠폰 뜰 때까지 좀 기다려봐야 할 듯. 나일론 소재 내구성도 좀 확인하고 싶어.&rdquo;</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <strong>참여 가능성</strong>
+            <div class="bar"><div class="bar-fill" style="width:80%; background:hsl(96, 70%, 50%);">80%</div></div>
+            <strong>공유 확률</strong>
+            <div class="bar"><div class="bar-fill" style="width:55%; background:hsl(66, 70%, 50%);">55%</div></div>
+            <strong>구매 의향</strong>
+            <div class="bar"><div class="bar-fill" style="width:50%; background:hsl(60, 70%, 50%);">50%</div></div>
+            <strong>감성</strong>
+            <div class="bar"><div class="bar-fill" style="width:81%; background:#86efac;">긍정 (+0.62)</div></div>
+          </div>
+          <div>
+            <strong style="color:var(--green);">매력 포인트</strong><br><span class="tag tag-green">모노그램 로고 디자인이 본인 스타일과 정확히 부합</span> <span class="tag tag-green">크로스바디 스트랩 탈착으로 믹스매치 스타일링 가능</span> <span class="tag tag-green">K-POP 아이돌 착용 브랜드라는 신뢰감</span>
+            <br><br>
+            <strong style="color:var(--orange);">우려사항</strong><br><span class="tag tag-orange">89000원이 아르바이트 예산 기준 부담스러운 가격대</span> <span class="tag tag-orange">런칭 프로모션·할인 쿠폰이 없으면 구매 시기 지연</span> <span class="tag tag-orange">나일론 소재의 내구성과 실물 질감 확인 필요</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>p04 정하은 (학생) &mdash; 참여 62% | 감성 <span style="color:#94a3b8">중립</span> | 공유 38% | 구매 18%</summary>
+      <div class="detail-content">
+        <div class="reaction-text">&ldquo;언니들 인스타에서 많이 보이는 그 MLB 미니백팩… 솔직히 너무 예쁜데 89000원은 내 용돈으로는 진짜 무리ㅋㅋㅋ 틱톡 챌린지 이벤트 같은 거 해주면 응모라도 해볼 텐데. 생일 때 엄마한테 넌지시 말해볼까 고민 중🤔&rdquo;</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <strong>참여 가능성</strong>
+            <div class="bar"><div class="bar-fill" style="width:62%; background:hsl(74, 70%, 50%);">62%</div></div>
+            <strong>공유 확률</strong>
+            <div class="bar"><div class="bar-fill" style="width:38%; background:hsl(45, 70%, 50%);">38%</div></div>
+            <strong>구매 의향</strong>
+            <div class="bar"><div class="bar-fill" style="width:18%; background:hsl(21, 70%, 50%);">18%</div></div>
+            <strong>감성</strong>
+            <div class="bar"><div class="bar-fill" style="width:65%; background:#94a3b8;">중립 (+0.30)</div></div>
+          </div>
+          <div>
+            <strong style="color:var(--green);">매력 포인트</strong><br><span class="tag tag-green">'언니들이 메는 가방'이라는 동경과 워너비 심리</span> <span class="tag tag-green">틱톡 챌린지·경품 이벤트 시 적극 참여 의향</span> <span class="tag tag-green">르세라핌 등 K-POP 아이돌 협업 콘텐츠에 즉각 반응 가능</span>
+            <br><br>
+            <strong style="color:var(--orange);">우려사항</strong><br><span class="tag tag-orange">89000원은 고등학생 예산으로 구매 사실상 불가능</span> <span class="tag tag-orange">부모님 설득이나 생일·명절 등 특별한 기회 필요</span> <span class="tag tag-orange">또래 친구들 사이에서도 가격 부담으로 공감대 형성 어려움</span>
+          </div>
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>p05 윤서진 (패션 마니아) &mdash; 참여 95% | 감성 <span style="color:#86efac">긍정</span> | 공유 88% | 구매 78%</summary>
+      <div class="detail-content">
+        <div class="reaction-text">&ldquo;MLB 2026 SS NYC 모노그램 미니백팩 실물 확인 완료. 나일론 경량 소재에 크로스바디 탈착 스트랩 구성은 실용성 면에서 확실히 진화했고, 'Your City, Your Style' 캠페인 방향성도 기존 반복적이던 라인업에서 벗어나 신선함. 다만 모노그램 패턴 자체는 전작과 큰 차이를 못 느끼겠어서 그 부분은 솔직 리뷰에서 짚을 예정. 언박싱 영상 이번 주 업로드합니다📦&rdquo;</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem;">
+          <div>
+            <strong>참여 가능성</strong>
+            <div class="bar"><div class="bar-fill" style="width:95%; background:hsl(114, 70%, 50%);">95%</div></div>
+            <strong>공유 확률</strong>
+            <div class="bar"><div class="bar-fill" style="width:88%; background:hsl(105, 70%, 50%);">88%</div></div>
+            <strong>구매 의향</strong>
+            <div class="bar"><div class="bar-fill" style="width:78%; background:hsl(93, 70%, 50%);">78%</div></div>
+            <strong>감성</strong>
+            <div class="bar"><div class="bar-fill" style="width:86%; background:#86efac;">긍정 (+0.72)</div></div>
+          </div>
+          <div>
+            <strong style="color:var(--green);">매력 포인트</strong><br><span class="tag tag-green">NYC 감성 캠페인 방향성이 기존 대비 신선함</span> <span class="tag tag-green">SS 시즌 첫 언박싱 콘텐츠로 채널 트래픽 확보 가능</span> <span class="tag tag-green">탈착 크로스바디 스트랩으로 다양한 스타일링 시연 가능</span>
+            <br><br>
+            <strong style="color:var(--orange);">우려사항</strong><br><span class="tag tag-orange">모노그램 패턴이 기존 시즌 제품과 차별화 부족 가능성</span> <span class="tag tag-orange">브랜드 라인업이 여전히 반복적이라는 기존 피드백과의 연장선</span> <span class="tag tag-orange">89000원 가격대가 경쟁 브랜드 유사 제품 대비 경쟁력 있는지 비교 필</span>
+          </div>
+        </div>
+      </div>
+    </details>
+
+<h2>Step 4: KPI 집계 (통계적 계산)</h2>
+<p>LLM 호출 없이, 개별 반응 데이터를 순수 Python으로 집계합니다.</p>
+
+<div class="card card-accent">
+  <h3>예측 참여율</h3>
+  <div class="formula">
+    (0.93 + 0.85 + 0.80 + 0.62 + 0.95) / 5<br>
+    = <span class="result">0.830 (83%)</span>
+  </div>
+</div>
+
+<div class="card card-accent">
+  <h3>평균 감성 점수</h3>
+  <div class="formula">
+    (0.85 + 0.68 + 0.62 + 0.30 + 0.72) / 5<br>
+    = <span class="result">+0.634</span> (범위: -1.0 ~ +1.0)
+  </div>
+  <h3>감성 분포</h3>
+  <div class="bar"><div class="bar-fill" style="width:20%; background:#22c55e;">매우 긍정 20%</div></div>
+<div class="bar"><div class="bar-fill" style="width:60%; background:#86efac;">긍정 60%</div></div>
+<div class="bar"><div class="bar-fill" style="width:20%; background:#94a3b8;">중립 20%</div></div>
+
+</div>
+
+<div class="card card-accent">
+  <h3>바이럴 확률</h3>
+  <div class="formula">
+    share_probability &gt; 0.6 인 페르소나 수 / 전체<br>
+    [0.91✓, 0.72✓, 0.55, 0.38, 0.88✓]<br>
+    = 3 / 5 = <span class="result">60%</span>
+  </div>
+</div>
+
+<div class="card card-accent">
+  <h3>평균 구매 의향</h3>
+  <div class="formula">
+    (0.82 + 0.58 + 0.50 + 0.18 + 0.78) / 5<br>
+    = <span class="result">0.572 (57%)</span>
+  </div>
+</div>
+
+<div class="card">
+  <h3>아키타입별 비교</h3>
+  <div style="display:flex; gap:1rem; justify-content:center; margin:1rem 0;">
+    <div class="kpi-box" style="border:1px solid var(--green);">
+      <div style="font-size:1.5rem;">🏆</div>
+      <div style="font-weight:700; color:var(--green);">패션 마니아</div>
+      <div class="kpi-label">가장 반응 좋은 세그먼트</div>
+    </div>
+    <div class="kpi-box" style="border:1px solid var(--orange);">
+      <div style="font-size:1.5rem;">⚠️</div>
+      <div style="font-weight:700; color:var(--orange);">학생</div>
+      <div class="kpi-label">가장 반응 약한 세그먼트</div>
+    </div>
+  </div>
+</div>
+
+<h2>Step 5: 리스크 감지 (규칙 기반)</h2>
+<p>5가지 규칙을 순차 평가하여 자동으로 리스크 플래그를 생성합니다.</p>
+
+<div class="card card-accent">
+  <table>
+    <tr><th>규칙</th><th>임계값</th><th>실제 값</th><th>판정</th></tr>
+    <tr><td>부정적 감성 우세</td><td><code>avg_sentiment < 0.0</code></td><td>+0.634</td><td><span class="check">PASS</span></td></tr>
+    <tr><td>낮은 참여율</td><td><code>engagement_rate < 0.3</code></td><td>0.830</td><td><span class="check">PASS</span></td></tr>
+    <tr><td>낮은 바이럴 가능성</td><td><code>viral_probability < 0.1</code></td><td>0.600</td><td><span class="check">PASS</span></td></tr>
+    <tr><td>낮은 구매 의향</td><td><code>purchase_intent < 0.3</code></td><td>0.572</td><td><span class="check">PASS</span></td></tr>
+    <tr><td>가격 민감도 리스크</td><td><code>가격우려 비율 > 30%</code></td><td>5/5 (100%)</td><td><span class="cross">TRIGGERED</span></td></tr>
+
+  </table>
+</div>
+
+<div class="card card-orange">
+  <h3>감지된 리스크</h3>
+  <div class="risk-badge risk-medium">⚠ 가격 민감도 리스크 — 4/5명이 가격 우려 언급</div><br>
+</div>
+
+<h2>Step 6: 추천사항 생성 (LLM 기반)</h2>
+
+<details>
+  <summary>LLM 프롬프트 (추천 생성용)</summary>
+  <div class="detail-content">
+    <pre>다음 캠페인 사전 테스트 결과를 바탕으로 3가지 핵심 추천사항을 제시하세요.
+
+KPI 결과:
+- 예측 참여율: 83.0%
+- 평균 감성: 0.63
+- 바이럴 확률: 60.0%
+- 구매 의향: 57.2%
+- 가장 반응 좋은 세그먼트: 패션 마니아
+- 가장 반응 약한 세그먼트: 학생
+- 주요 매력 포인트: 모노그램 로고 플레이가 피드 구성에 최적화된 비주얼, 미니백팩+크로스바디 탈착 스트랩의 스타일링 다양성, NYC 감성이 본인의 시티 캐주얼 무드와 정확히 부합
+- 주요 우려사항: 마리떼프랑소와저버·디스이즈네버댓 SS 라인업과의 비교 검토 중, 모노그램 디자인이 기존 라인과 얼마나 차별화되는지 실물 확인 필요, 89000원이 콘텐츠 활용 가치 대비 적정한지 계산 중
+
+리스크: 가격 민감도 리스크
+
+temperature=0.5 (일관성) | 각 추천사항은 1-2문장으로 구체적이고 실행 가능하게</pre>
+  </div>
+</details>
+
+
+    <div class="card card-green">
+      <strong>추천 1</strong>
+      <p style="margin-top:6px;">경쟁 브랜드(마리떼프랑소와저버·디스이즈네버댓) 대비 MLB 모노그램만의 차별점을 부각하는 '실물 언박싱 & 스타일링 비교' 숏폼 콘텐츠를 제작하여, 디자인 차별화에 대한 의구심을 선제적으로 해소하세요.</p>
+    </div>
+    <div class="card card-green">
+      <strong>추천 2</strong>
+      <p style="margin-top:6px;">student 세그먼트의 가격 민감도를 공략하기 위해 '89,000원으로 크로스바디+백팩 2가지 스타일링' 등 1개 가격에 다중 활용 가치를 강조하는 가성비 프레이밍 메시지와 함께 학생 대상 한정 할인·무이자 혜택을 병행 운영하세요.</p>
+    </div>
+    <div class="card card-green">
+      <strong>추천 3</strong>
+      <p style="margin-top:6px;">fashion_enthusiast 세그먼트의 높은 반응을 극대화하기 위해 패션 인플루언서와 협업한 'NYC 시티 캐주얼 OOTD 챌린지'를 런칭하고, 피드 최적화 비주얼 템플릿을 제공하여 바이럴 확률(현 60%)을 적극 끌어올리세요.</p>
+    </div>
+
+<div style="margin-top:3rem; padding:1.5rem; text-align:center; color:var(--text-dim); font-size:0.8rem; border-top:1px solid var(--card-border);">
+  FnF Marketing Simulator &middot; Campaign Pre-Test Report<br>
+  Campaign ID: 9c322bac &middot; 5 personas &middot; Generated: 2026-03-25T15:27:27<br>
+  Powered by Claude Opus 4.6 + MiroFish Core Engine
+</div>
+</body>
+</html>

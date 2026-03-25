@@ -1,0 +1,55 @@
+{
+  "_description": "Fashion domain entity types for MiroFish ontology generation",
+  "entity_types": [
+    {
+      "name": "FashionConsumer",
+      "description": "패션 제품을 구매하고 소비하는 일반 소비자",
+      "attributes": ["age", "gender", "fashion_interest", "price_sensitivity", "preferred_style"]
+    },
+    {
+      "name": "Influencer",
+      "description": "SNS에서 패션 콘텐츠를 생산하고 팔로워에게 영향을 미치는 인플루언서",
+      "attributes": ["follower_count", "platform", "content_style", "engagement_rate"]
+    },
+    {
+      "name": "BrandLoyalist",
+      "description": "특정 브랜드에 높은 충성도를 보이는 고정 고객",
+      "attributes": ["loyal_brand", "purchase_frequency", "advocacy_level"]
+    },
+    {
+      "name": "CasualBuyer",
+      "description": "브랜드 충성도 낮고 트렌드/가격에 따라 유동적으로 구매하는 소비자",
+      "attributes": ["price_sensitivity", "trend_following", "purchase_trigger"]
+    },
+    {
+      "name": "TrendFollower",
+      "description": "최신 트렌드를 빠르게 채택하고 확산시키는 얼리어답터형 소비자",
+      "attributes": ["trend_awareness", "adoption_speed", "social_sharing"]
+    },
+    {
+      "name": "FashionCritic",
+      "description": "패션에 대한 리뷰/비평을 생산하며 커뮤니티에서 의견 형성에 기여",
+      "attributes": ["expertise_level", "review_style", "platform"]
+    },
+    {
+      "name": "CompetitorFan",
+      "description": "경쟁 브랜드에 충성도가 높은 소비자",
+      "attributes": ["preferred_competitor", "switch_likelihood", "comparison_criteria"]
+    },
+    {
+      "name": "MediaOutlet",
+      "description": "패션 미디어, 매거진, 블로그 등 정보를 대규모로 확산하는 매체",
+      "attributes": ["reach", "platform", "content_focus"]
+    }
+  ],
+  "relationship_types": [
+    {"name": "follows_trend", "description": "트렌드를 따르는 관계"},
+    {"name": "buys_from", "description": "브랜드에서 구매하는 관계"},
+    {"name": "influenced_by", "description": "영향을 받는 관계"},
+    {"name": "competes_with", "description": "경쟁하는 관계"},
+    {"name": "recommends", "description": "추천하는 관계"},
+    {"name": "reviews", "description": "리뷰/평가하는 관계"},
+    {"name": "shares_content", "description": "콘텐츠를 공유하는 관계"},
+    {"name": "belongs_to_segment", "description": "소비자 세그먼트에 속하는 관계"}
+  ]
+}

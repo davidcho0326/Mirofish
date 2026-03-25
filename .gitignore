@@ -1,0 +1,23 @@
+# Environment
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Data (keep reports, ignore uploads/simulations)
+data/uploads/
+data/simulations/
+*.db
+
+# Logs
+logs/
+log/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
